@@ -11,48 +11,10 @@ plugins {
 }
 
 group = "dev.nikdekur"
-version = "1.0.0"
+version = "1.0.1"
 
 val authorId: String by project
 val authorName: String by project
-
-repositories {
-    mavenCentral().apply {
-        content {
-            excludeGroup("Kotlin/Native")
-        }
-    }
-
-    mavenLocal().apply {
-        content {
-            excludeGroup("Kotlin/Native")
-        }
-    }
-
-    google().apply {
-        content {
-            excludeGroup("Kotlin/Native")
-        }
-    }
-
-    maven {
-        name = "Sonatype Snapshots (Legacy)"
-        url = uri("https://oss.sonatype.org/content/repositories/snapshots")
-    }.apply {
-        content {
-            excludeGroup("Kotlin/Native")
-        }
-    }
-
-    maven {
-        name = "Sonatype Snapshots"
-        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
-    }.apply {
-        content {
-            excludeGroup("Kotlin/Native")
-        }
-    }
-}
 
 kotlin {
     explicitApi()
@@ -101,6 +63,7 @@ kotlin {
 
             val dependencies = listOf(
                 libs.kotlinx.coroutines.core,
+                libs.kotlinx.coroutines.test,
                 libs.kotlinx.serialization.core,
                 libs.kotlinx.serialization.json,
                 libs.kotlinx.serialization.properties,
@@ -121,7 +84,17 @@ kotlin {
 
         jvmMain.dependencies {
             compileOnly(libs.slf4j.api)
+
+            // MONGODB
             compileOnly(libs.mongodb)
+
+            // CERTIFICATES
+            compileOnly(libs.bouncycastle.prov)
+            compileOnly(libs.bouncycastle.pkix)
+
+            // SERIAL - GSON
+            compileOnly(libs.gson)
+
             compileOnly(libs.google.guava)
         }
 
@@ -130,15 +103,20 @@ kotlin {
             implementation(libs.kotlin.logging)
             implementation(libs.bignum)
 
-            implementation(libs.kotlinx.coroutines.test)
             implementation(kotlin("test"))
 
             // Logback is not supported on jdk-8
             implementation(libs.slf4j.simple)
             implementation(libs.koin)
             implementation(libs.google.guava)
+            implementation(libs.gson)
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.kotlinx.serialization.properties)
+
+
+            // CERTIFICATES
+            implementation(libs.bouncycastle.prov)
+            implementation(libs.bouncycastle.pkix)
         }
     }
 }

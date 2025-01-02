@@ -7,6 +7,7 @@ import dev.nikdekur.ornament.Application.State
 import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.datetime.Clock
 import kotlin.time.Duration
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
@@ -42,6 +43,8 @@ public abstract class AbstractApplication : Application {
 
     override val logger: KLogger = KotlinLogging.logger { }
 
+    override val clock: Clock = Clock.System
+
     public var initTime: TimeMark? = null
     public var lastStartTime: TimeMark? = null
     public var waiter: CompletableDeferred<Unit>? = null
@@ -69,44 +72,54 @@ public abstract class AbstractApplication : Application {
         servicesManager = createServicesManager()
     }
 
-    override suspend fun start(wait: Boolean) {
+    override suspend fun start(
+        wait: Boolean,
+        throwOnException: Boolean
+    ) {
         check(state.allowStart) { "Cannot start the application from the `$state` state!" }
 
         lastStartTime = timeSource.markNow()
         state = State.Starting
 
         try {
-            println("OR 1")
+            logger.trace { "Before Start called" }
             beforeStart()
+            logger.trace { "Before Start finished" }
 
-            println("OR 2")
+
+            logger.debug { "Enabling services" }
             logger.recordTiming(TimeSource.Monotonic, "enabling services") {
                 servicesManager.enable()
             }
-            println("OR 3")
+            logger.debug { "Services enabled!" }
 
+
+            logger.trace { "After Start called" }
             afterStart()
-            println("OR 4")
+            logger.trace { "After Start finished" }
+
         } catch (e: Throwable) {
+            logger.trace(e) { "Error occurred while starting the application. Throw on error: $throwOnException" }
             state = State.ErrorStarting(e)
+            if (throwOnException)
+                throw ApplicationStartException(e)
             return
         }
-        println("OR 5")
+
+        logger.trace { "No errors occurred during start" }
 
         state = RunningState {
             lastStartTime?.elapsedNow() ?: Duration.ZERO
         }
 
-        println("OR 6")
-
         if (wait) {
-            println("OR 6.5")
+            logger.trace { "Waiting for application to stop" }
             CompletableDeferred<Unit>()
                 .also { waiter = it }
                 .smartAwait()
         }
 
-        println("OR 7")
+        logger.info { "Successfully started!" }
     }
 
 
@@ -194,3 +207,6 @@ public abstract class AbstractApplication : Application {
 
     }
 }
+
+
+public open class ApplicationStartException(cause: Throwable) : RuntimeException("Application failed to start.", cause)

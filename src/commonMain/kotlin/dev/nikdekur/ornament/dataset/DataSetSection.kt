@@ -15,5 +15,20 @@ public interface DataSetSection {
     public fun <T : Any> get(key: String?, clazz: KClass<T>): T?
 }
 
+public interface MutableDataSetSection : DataSetSection {
+
+    override fun getSection(key: String): MutableDataSetSection?
+    public fun set(key: String?, value: Any)
+    public fun remove(key: String)
+    public fun clear()
+}
+
+
+public open class SerializationException(
+    public val key: String?,
+    public val clazz: KClass<*>,
+    public val actual: String
+) : RuntimeException("Failed to deserialize key '$key' to class '${clazz.simpleName}'. Value: $actual")
+
 
 public inline fun <reified T : Any> DataSetSection.get(key: String?) = get(key, T::class)

@@ -6,45 +6,53 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
+@file:Suppress("NOTHING_TO_INLINE")
+
 package dev.nikdekur.ornament.dataset.yaml
 
 import dev.nikdekur.ornament.Application
-import dev.nikdekur.ornament.dataset.DataSetSection
 import dev.nikdekur.ornament.dataset.DataSetService
-import dev.nikdekur.ornament.dataset.map.MapDataSetService
+import dev.nikdekur.ornament.dataset.MutableDataSetSection
+import dev.nikdekur.ornament.dataset.map.MutableMapDataSetService
+import dev.nikdekur.ornament.dataset.map.defaultJson
+import dev.nikdekur.ornament.dataset.map.getSerializersModule
 import dev.nikdekur.ornament.service.AbstractAppService
+import kotlinx.serialization.json.Json
 import net.mamoe.yamlkt.Yaml
 import kotlin.reflect.KClass
 
-// Abstract for [configPath] and [yaml] properties
+public inline fun defaultYaml(): Yaml = Yaml {
+    serializersModule = getSerializersModule()
+}
+
 public abstract class YamlKtDataSetService<A : Application>(
-    override val app: A
+    public open val yaml: Yaml = defaultYaml(),
+    public val json: Json = defaultJson()
 ) : AbstractAppService<A>(), DataSetService {
 
-    private var _delegate: MapDataSetService<*>? = null
-    protected val delegate: MapDataSetService<*>
-        get() = _delegate ?: error("Config not loaded!")
+    protected var delegateOrNull: MutableMapDataSetService<*>? = null
+    public val delegate: MutableMapDataSetService<*>
+        get() = delegateOrNull ?: error("Config not loaded!")
 
     public abstract fun read(): String
-
-    public open val yaml: Yaml = Yaml
 
     override suspend fun onEnable() {
         val text = read()
 
         @Suppress("UNCHECKED_CAST")
-        _delegate = MapDataSetService(
+        delegateOrNull = MutableMapDataSetService(
             app,
-            yaml.decodeMapFromString(text) as Map<String, Any>
+            yaml.decodeMapFromString(text).toMutableMap() as MutableMap<String, Any>,
+            json
         ).also { it.enable() }
     }
 
     override suspend fun onDisable() {
+        val delegate = delegateOrNull ?: return
         delegate.disable()
-        // Don't nullify delegate here, as might be necessary for shutdown tasks
     }
 
 
     override fun <T : Any> get(key: String?, clazz: KClass<T>): T? = delegate.get<T>(key, clazz)
-    override fun getSection(key: String): DataSetSection? = delegate.getSection(key)
+    override fun getSection(key: String): MutableDataSetSection? = delegate.getSection(key)
 }

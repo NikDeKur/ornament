@@ -33,34 +33,33 @@ public abstract class AbstractJVMConsoleApplicationBoot : ApplicationBoot {
     public suspend fun boot(args: Array<String>) {
         var id: String? = null
         try {
-            println("LOL 1")
+            logger.trace { "Booting application..." }
             val environment = ConsoleMapEnvironment.fromCommandLineArgs(args)
-            println("LOL 2")
+
+            logger.trace { "Creating application..." }
             val app = createApp(environment)
-            println("LOL 3")
+
             id = app.id
 
-            println("LOL 4")
+            logger.trace { "Initializing application..." }
             app.init()
 
-            println("LOL 5")
             logger.info { "Starting `${app.id}`..." }
 
-            println("LOL 6")
             addBlockingShutdownHook {
                 logger.info { "Uptime: `${app.uptime}`" }
-
                 logger.info { "Shutting down `${id}`..." }
+
                 app.stop()
             }
 
-            println("LOL 7")
+            logger.trace { "Shutdown hook added." }
             app.start(wait = true)
 
             val state = app.state
             if (state is State.ErrorStarting) throw state.error
 
-            println("LOL 8")
+            logger.info { "Application `$id` started!" }
 
         } catch (e: Throwable) {
             logger.error(e) { "Fatal error occurred during `${id ?: "UNKNOWN_ID"}` initialization. Shutting down..." }

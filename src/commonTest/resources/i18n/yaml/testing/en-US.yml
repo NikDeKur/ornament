@@ -1,0 +1,8 @@
+key1:
+  - "Test"
+
+key2:
+  - "Test {value}"
+
+key3:
+  - "Let's go test! {value} {value2}"

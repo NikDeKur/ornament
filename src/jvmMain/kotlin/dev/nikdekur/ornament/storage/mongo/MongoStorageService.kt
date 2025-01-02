@@ -23,13 +23,13 @@ import dev.nikdekur.ornament.dataset.get
 import dev.nikdekur.ornament.service.AbstractAppService
 import dev.nikdekur.ornament.storage.StorageService
 import dev.nikdekur.ornament.storage.StorageTable
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import org.bson.Document
 import org.bson.codecs.configuration.CodecRegistries.fromProviders
 import org.bson.codecs.configuration.CodecRegistries.fromRegistries
 import org.bson.codecs.pojo.PojoCodecProvider
+import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 
 
@@ -46,12 +46,8 @@ public open class MongoStorageService<A : Application>(
     public var client: MongoClient? = null
     public var database: MongoDatabase? = null
 
-    public var scope: CoroutineScope? = null
-
     override suspend fun onEnable() {
         logger.info { "Initializing Database" }
-
-        scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
         val config = dataSetService.get<MongoDataSet>("mongo")
             ?: error("Config for Mongo not found")
@@ -67,9 +63,19 @@ public open class MongoStorageService<A : Application>(
 
         val connectionString = ConnectionString(config.url)
 
+
         val mongoClientSettings = MongoClientSettings.builder()
             .applyConnectionString(connectionString)
             .codecRegistry(pojoCodecRegistry)
+            .applyToConnectionPoolSettings {
+                it.maxSize(100) //connections count
+                    .minSize(5)
+                    .maxConnectionLifeTime(30, TimeUnit.MINUTES)
+                    .maxConnectionIdleTime(0, TimeUnit.MILLISECONDS)
+            }
+            .applyToSocketSettings {
+                it.connectTimeout(2000, TimeUnit.MILLISECONDS)
+            }
             .serverApi(serverApi)
             .build()
 
@@ -82,19 +88,15 @@ public open class MongoStorageService<A : Application>(
 
 
         // Ping the server to see if it's alive
-        runBlocking {
-            database.runCommand(Document("ping", 1))
-        }
+        database.runCommand(Document("ping", 1))
 
         logger.info { "Database initialized" }
     }
 
     override suspend fun onDisable() {
-        val scope = scope
         val client = client
-        if (scope != null && client != null) {
+        if (client != null) {
             logger.info { "Disconnecting from Database" }
-            scope.cancel()
             client.close()
         } else {
             logger.warn { "Database was not initialized" }

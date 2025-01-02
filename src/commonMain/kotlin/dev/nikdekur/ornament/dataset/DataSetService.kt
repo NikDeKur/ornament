@@ -10,3 +10,5 @@ package dev.nikdekur.ornament.dataset
 
 public interface DataSetService : DataSetSection
 
+public interface MutableDataSetService : DataSetService, MutableDataSetSection
+

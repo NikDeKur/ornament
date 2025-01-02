@@ -10,14 +10,19 @@
 
 package dev.nikdekur.ornament.dataset.map
 
+import dev.nikdekur.ndkore.ext.encodeToMap
 import dev.nikdekur.ndkore.ext.toBooleanSmartOrNull
+import dev.nikdekur.ndkore.ext.toJsonElement
 import dev.nikdekur.ornament.dataset.DataSetSection
+import dev.nikdekur.ornament.dataset.MutableDataSetSection
+import dev.nikdekur.ornament.dataset.SerializationException
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
 import kotlin.reflect.KClass
+import kotlinx.serialization.SerializationException as XSerializationException
 
 public object DynamicLookupSerializer : KSerializer<Any> {
     override val descriptor: SerialDescriptor = ContextualSerializer(Any::class, null, emptyArray()).descriptor
@@ -33,46 +38,6 @@ public object DynamicLookupSerializer : KSerializer<Any> {
     }
 }
 
-public fun Any?.toJsonElement(): JsonElement {
-    return when (this) {
-        is Number -> JsonPrimitive(this)
-        is Boolean -> JsonPrimitive(this)
-        is String -> JsonPrimitive(this)
-        is Array<*> -> toJsonArray()
-        is List<*> -> toJsonArray()
-        is Map<*, *> -> toJsonObject()
-        is JsonElement -> this
-        else -> JsonNull
-    }
-}
-
-
-public fun Array<*>.toJsonArray(): JsonArray {
-    val array = mutableListOf<JsonElement>()
-    this.forEach { array.add(it.toJsonElement()) }
-    return JsonArray(array)
-}
-
-
-public fun List<*>.toJsonArray(): JsonArray {
-    val array = mutableListOf<JsonElement>()
-    this.forEach { array.add(it.toJsonElement()) }
-    return JsonArray(array)
-}
-
-
-public fun Map<*, *>.toJsonObject(): JsonObject {
-    val map = mutableMapOf<String, JsonElement>()
-    this.forEach {
-        val key = it.key
-        if (key is String) {
-            map[key] = it.value.toJsonElement()
-        }
-    }
-    return JsonObject(map)
-}
-
-
 public open class MapDataSetSection(
     public val json: Json,
     public val map: Map<String, Any>
@@ -86,29 +51,75 @@ public open class MapDataSetSection(
     }
 
 
-    public fun <T : Any> resolve(obj: Any, clazz: KClass<T>): T {
-        @Suppress("UNCHECKED_CAST")
+    @Suppress("UNCHECKED_CAST")
+    public fun <T : Any> resolve(obj: Any, clazz: KClass<T>): T? {
         if (clazz.isInstance(obj)) return obj as T
-        @Suppress("UNCHECKED_CAST")
         when (clazz) {
             String::class -> return obj.toString() as T
-            Byte::class -> return obj.toString().toByteOrNull() as T
-            Short::class -> return obj.toString().toShortOrNull() as T
-            Int::class -> return obj.toString().toIntOrNull() as T
-            Long::class -> return obj.toString().toLongOrNull() as T
-            Float::class -> return obj.toString().toFloatOrNull() as T
-            Double::class -> return obj.toString().toDoubleOrNull() as T
-            Boolean::class -> return obj.toString().toBooleanSmartOrNull() as T
+            Byte::class -> return obj.toString().toByteOrNull() as? T
+            Short::class -> return obj.toString().toShortOrNull() as? T
+            Int::class -> return obj.toString().toIntOrNull() as? T
+            Long::class -> return obj.toString().toLongOrNull() as? T
+            Float::class -> return obj.toString().toFloatOrNull() as? T
+            Double::class -> return obj.toString().toDoubleOrNull() as? T
+            Boolean::class -> return obj.toString().toBooleanSmartOrNull() as? T
         }
 
+        val serializer = json.serializersModule.serializer(clazz, emptyList(), false) as KSerializer<T>
+
         val jsonElement = obj.toJsonElement()
-        return json.decodeFromJsonElement(clazz.serializer(), jsonElement)
+        return json.decodeFromJsonElement(serializer, jsonElement)
     }
 
 
     override operator fun <T : Any> get(key: String?, clazz: KClass<T>): T? {
-        if (key == null) return resolve(map, clazz)
-        val at = map[key] ?: return null
-        return resolve(at, clazz)
+        val actual = if (key == null) map else map[key] ?: return null
+
+        try {
+            return resolve(actual, clazz) ?: throw SerializationException(key, clazz, actual.toString())
+        } catch (e: XSerializationException) {
+            e.printStackTrace()
+            throw SerializationException(key, clazz, actual.toString())
+        } catch (e: IllegalArgumentException) {
+            throw SerializationException(key, clazz, actual.toString())
+        }
     }
+}
+
+
+public open class MutableMapDataSetSection(
+    json: Json,
+    public val mutableMap: MutableMap<String, Any>
+) : MapDataSetSection(json, mutableMap), MutableDataSetSection {
+
+    override fun getSection(key: String): MutableDataSetSection? {
+        @Suppress("UNCHECKED_CAST")
+        val map = mutableMap[key] as? Map<String, Any> ?: return null
+        val mutable = map as? MutableMap
+            ?: map.toMutableMap().also { mutableMap[key] = it }
+
+        return MutableMapDataSetSection(json, mutable)
+    }
+
+    override fun set(key: String?, value: Any) {
+        @Suppress("UNCHECKED_CAST")
+        if (key == null) {
+            val serializer = json.serializersModule.serializer(value::class, emptyList(), false) as KSerializer<Any>
+            val map = json.encodeToMap(value, serializer) as Map<String, Any>
+
+            mutableMap.clear()
+            mutableMap.putAll(map)
+        } else {
+            mutableMap[key] = value
+        }
+    }
+
+    override fun remove(key: String) {
+        mutableMap.remove(key)
+    }
+
+    override fun clear() {
+        mutableMap.clear()
+    }
+
 }

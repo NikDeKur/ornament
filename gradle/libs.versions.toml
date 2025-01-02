@@ -1,19 +1,22 @@
 [versions]
-kotlin = "2.1.0-RC2"
+kotlin = "2.1.20-Beta1"
 kotlinx-coroutines = "1.9.0"
 kotlinx-serialization = "1.7.3"
 kotlinx-datetime = "0.6.1"
 kotlinx-io = "0.5.4"
 kotlin-logging = "7.0.0"
 stately = "2.1.0"
-ndkore = "1.4.5"
+ndkore = "1.5.0"
 bignum = "0.3.10"
 google-guava = "33.3.0-jre"
 slf4j = "2.0.16"
 licenser = "0.6.1"
 yamlkt = "0.14.0"
-mongodb = "5.2.0"
+mongodb = "5.3.0-beta0"
+bouncycastle = "1.79"
 koin = "4.0.0"
+gson = "2.11.0"
+
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -27,12 +30,15 @@ kotlin-logging = { module = "io.github.oshai:kotlin-logging", version.ref = "kot
 ndkore = { module = "dev.nikdekur:ndkore", version.ref = "ndkore" }
 stately-concurrency = { module = "co.touchlab:stately-concurrency", version.ref = "stately" }
 stately-concurrent-collections = { module = "co.touchlab:stately-concurrent-collections", version.ref = "stately" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
 google-guava = { module = "com.google.guava:guava", version.ref = "google-guava" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 yamlkt = { module = "net.mamoe.yamlkt:yamlkt", version.ref = "yamlkt" }
 mongodb = { module = "org.mongodb:mongodb-driver-kotlin-coroutine", version.ref = "mongodb" }
+bouncycastle-prov = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
+bouncycastle-pkix = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bouncycastle" }
 koin = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 
 [plugins]

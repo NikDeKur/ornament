@@ -27,11 +27,11 @@ public interface StorageTable<T : Any> {
         skip: Int? = null
     ): Flow<T>
 
-    public suspend fun replaceOne(data: T, vararg filters: Filter)
+    public suspend fun replaceOne(data: T, vararg filters: Filter): Boolean
 
-    public suspend fun deleteOne(vararg filters: Filter)
-    public suspend fun deleteMany(vararg filters: Filter)
+    public suspend fun deleteOne(vararg filters: Filter): Boolean
+    public suspend fun deleteMany(vararg filters: Filter): Long
 
 
-    public suspend fun createIndex(name: String, keys: Map<String, Int>, options: IndexOptions)
+    public suspend fun createIndex(keys: Map<String, Int>, options: IndexOptions)
 }

@@ -9,12 +9,13 @@
 package dev.nikdekur.ornament.dataset
 
 import dev.nikdekur.ndkore.service.get
-import dev.nikdekur.ornament.dataset.map.MapDataSetService
+import dev.nikdekur.ornament.dataset.map.MutableMapDataSetService
 import dev.nikdekur.ornament.testApplication
+import kotlinx.coroutines.test.TestScope
 
-class MapDataSetServiceTest : DataSetServiceTest() {
+open class MapDataSetServiceTest : MutableDataSetServiceTest() {
 
-    val map = hashMapOf(
+    val map: MutableMap<String, Any> = hashMapOf(
 
         "key1" to "value1",
         "key2" to 2,
@@ -45,11 +46,11 @@ class MapDataSetServiceTest : DataSetServiceTest() {
         )
     )
 
-    override suspend fun getDataSet(): DataSetService {
-        val server = testApplication {
+    override suspend fun TestScope.getDataSet(): MutableDataSetService {
+        val server = testApplication(this) {
             service(
-                { MapDataSetService(it, map) },
-                DataSetService::class
+                service = { MutableMapDataSetService(it, map) },
+                bindTo = arrayOf(MutableDataSetService::class, DataSetService::class)
             )
         }
 

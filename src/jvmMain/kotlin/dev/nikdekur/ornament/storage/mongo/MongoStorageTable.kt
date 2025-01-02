@@ -32,8 +32,8 @@ public class MongoStorageTable<T : Any>(
         collection.insertMany(data)
     }
 
-    override suspend fun replaceOne(data: T, vararg filters: Filter) {
-        collection.replaceOne(filters.toBson(), data)
+    override suspend fun replaceOne(data: T, vararg filters: Filter): Boolean {
+        return collection.replaceOne(filters.toBson(), data).matchedCount == 1L
     }
 
     override fun find(
@@ -57,16 +57,17 @@ public class MongoStorageTable<T : Any>(
         return request
     }
 
-    override suspend fun deleteOne(vararg filters: Filter) {
-        collection.deleteOne(filters.toBson())
+    override suspend fun deleteOne(vararg filters: Filter): Boolean {
+        return collection.deleteOne(filters.toBson()).deletedCount == 1L
     }
 
-    override suspend fun deleteMany(vararg filters: Filter) {
-        collection.deleteMany(filters.toBson())
+    override suspend fun deleteMany(vararg filters: Filter): Long {
+        return collection.deleteMany(filters.toBson()).deletedCount
     }
 
-    override suspend fun createIndex(name: String, keys: Map<String, Int>, options: IndexOptions) {
+    override suspend fun createIndex(keys: Map<String, Int>, options: IndexOptions) {
         val options = mongoIndexOptions {
+            name(options.name)
             unique(options.unique)
         }
 
@@ -74,5 +75,4 @@ public class MongoStorageTable<T : Any>(
         keys.forEach { (key, value) -> bson[key] = value }
         collection.createIndex(bson, options)
     }
-
 }

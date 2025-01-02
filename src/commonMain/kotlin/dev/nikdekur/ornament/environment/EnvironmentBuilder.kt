@@ -15,6 +15,9 @@ import kotlin.contracts.contract
  */
 public class EnvironmentBuilder {
 
+    public val valuesMap: MutableMap<String, String> = mutableMapOf()
+    public val requestsMap: MutableMap<String, String> = mutableMapOf()
+
     /**
      * The function to get a value for a key.
      *
@@ -48,8 +51,7 @@ public class EnvironmentBuilder {
      * @param value the value
      */
     public fun value(key: String, value: String) {
-        val previous = onGetValueFunc
-        onGetValueFunc = { if (it == key) value else previous(it) }
+        valuesMap[key] = value
     }
 
     /**
@@ -62,8 +64,7 @@ public class EnvironmentBuilder {
      * @param value the value
      */
     public fun request(key: String, value: String) {
-        val previous = onRequestValueFunc
-        onRequestValueFunc = { if (it == key) value else previous(it) }
+        requestsMap[key] = value
     }
 
     /**
@@ -75,8 +76,8 @@ public class EnvironmentBuilder {
      */
     public fun build(): Environment {
         return object : Environment {
-            override fun getValue(key: String) = onGetValueFunc(key)
-            override fun requestValue(key: String, description: String) = onRequestValueFunc(key)
+            override fun getValue(key: String) = valuesMap[key] ?: onGetValueFunc(key)
+            override fun requestValue(key: String, description: String) = requestsMap[key] ?: onRequestValueFunc(key)
         }
     }
 }

@@ -10,6 +10,7 @@
 
 package dev.nikdekur.ornament.storage.request
 
+import kotlinx.serialization.Serializable
 import kotlin.reflect.KProperty
 
 public enum class Order {
@@ -17,6 +18,7 @@ public enum class Order {
     DESCENDING
 }
 
+@Serializable
 public data class Sort(
     val field: String,
     val order: Order

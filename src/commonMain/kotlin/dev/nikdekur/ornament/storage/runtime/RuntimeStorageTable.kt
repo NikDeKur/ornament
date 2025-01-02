@@ -45,11 +45,13 @@ public class RuntimeStorageTable<T : Any> : StorageTable<T> {
         storage.addAll(data)
     }
 
-    override suspend fun replaceOne(data: T, vararg filters: Filter) {
+    override suspend fun replaceOne(data: T, vararg filters: Filter): Boolean {
         val index = storage.indexOfFirst { item -> filters.all { applyFilter(item, it) } }
         if (index != -1) {
             storage[index] = data
+            return true
         }
+        return false
     }
 
     override fun find(
@@ -70,28 +72,36 @@ public class RuntimeStorageTable<T : Any> : StorageTable<T> {
         emitAll(filteredData.asFlow())
     }
 
-    override suspend fun deleteOne(vararg filters: Filter) {
+    override suspend fun deleteOne(vararg filters: Filter): Boolean {
         val index = storage.indexOfFirst { item -> filters.all { applyFilter(item, it) } }
         if (index != -1) {
             storage.removeAt(index)
+            return true
         }
+        return false
     }
 
-    override suspend fun deleteMany(vararg filters: Filter) {
-        storage.removeAll { item -> filters.all { applyFilter(item, it) } }
+    override suspend fun deleteMany(vararg filters: Filter): Long {
+        var count = 0L
+
+        storage.removeAll { item ->
+            filters.all {
+                applyFilter(item, it)
+            }.also { if (it) count++ }
+        }
+
+        return count
     }
 
-    override suspend fun createIndex(
-        name: String,
-        keys: Map<String, Int>,
-        options: IndexOptions
-    ) {
+    override suspend fun createIndex(keys: Map<String, Int>, options: IndexOptions) {
         // No implementation for now
     }
 
     public fun <T> compare(a: Comparable<T>, b: Comparable<*>): Int {
-        if (a is Number && b is Number) return a.toDouble().compareTo(b.toDouble())
+        if (a is Number && b is Number)
+            return a.toDouble().compareTo(b.toDouble())
 
+        @Suppress("UNCHECKED_CAST")
         return a.compareTo(b as T)
     }
 

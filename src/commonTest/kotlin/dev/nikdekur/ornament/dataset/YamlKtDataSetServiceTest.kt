@@ -12,8 +12,9 @@ import dev.nikdekur.ndkore.service.get
 import dev.nikdekur.ornament.Application
 import dev.nikdekur.ornament.dataset.yaml.YamlKtDataSetService
 import dev.nikdekur.ornament.testApplication
+import kotlinx.coroutines.test.TestScope
 
-class YamlKtConfigDataSetServiceTest : DataSetServiceTest() {
+class YamlKtDataSetServiceTest : DataSetServiceTest() {
 
     val config = """
                 key1: value1
@@ -39,10 +40,12 @@ class YamlKtConfigDataSetServiceTest : DataSetServiceTest() {
                 """.trimIndent()
 
 
-    override suspend fun getDataSet(): DataSetService {
-        val server = testApplication {
+    override suspend fun TestScope.getDataSet(): DataSetService {
+        val server = testApplication(this) {
             service({
-                object : YamlKtDataSetService<Application>(it) {
+                object : YamlKtDataSetService<Application>() {
+                    override val app = it
+
                     override fun read(): String {
                         return config
                     }

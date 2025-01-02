@@ -46,6 +46,8 @@ public inline fun mongoIndexOptions(block: IndexOptions.() -> Unit): IndexOption
     return IndexOptions().apply(block)
 }
 
+public inline fun nullError(): Nothing = error("Value must be provided for greater than operator")
+
 public fun Filter.toBson(): Bson {
     return when (operator) {
         CompOperator.EQUALS -> Filters.eq(
@@ -60,22 +62,22 @@ public fun Filter.toBson(): Bson {
 
         CompOperator.GREATER_THAN -> Filters.gt(
             key,
-            value
+            value ?: nullError()
         )
 
         CompOperator.LESS_THAN -> Filters.lt(
             key,
-            value
+            value ?: nullError()
         )
 
         CompOperator.GREATER_THAN_OR_EQUALS -> Filters.gte(
             key,
-            value
+            value ?: nullError()
         )
 
         CompOperator.LESS_THAN_OR_EQUALS -> Filters.lte(
             key,
-            value
+            value ?: nullError()
         )
     }
 }

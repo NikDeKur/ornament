@@ -8,7 +8,7 @@
 
 package dev.nikdekur.ornament.storage.table
 
-import dev.nikdekur.ndkore.service.manager.getService
+import dev.nikdekur.ndkore.service.get
 import dev.nikdekur.ornament.storage.StorageService
 import dev.nikdekur.ornament.storage.runtime.RuntimeStorageService
 import dev.nikdekur.ornament.testApplication
@@ -20,11 +20,11 @@ class RuntimeStorageServiceTableTest : StorageTableTest() {
 
     @BeforeTest
     fun setup() = runTest {
-        val server = testApplication {
+        val server = testApplication(this) {
             service(::RuntimeStorageService, StorageService::class)
         }
 
-        service = server.servicesManager.getService()
+        service = server.servicesManager.get()
     }
 
 

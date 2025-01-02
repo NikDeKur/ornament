@@ -8,7 +8,7 @@
 
 package dev.nikdekur.ornament.storage
 
-import dev.nikdekur.ndkore.service.manager.getService
+import dev.nikdekur.ndkore.service.get
 import dev.nikdekur.ornament.storage.runtime.RuntimeStorageService
 import dev.nikdekur.ornament.testApplication
 import kotlinx.coroutines.test.runTest
@@ -18,11 +18,11 @@ class RuntimeStorageServiceTest : StorageServiceTest() {
 
     @BeforeTest
     fun setup() = runTest {
-        val server = testApplication {
+        val server = testApplication(this) {
             service(::RuntimeStorageService, StorageService::class)
         }
 
-        service = server.servicesManager.getService()
+        service = server.servicesManager.get()
     }
 
 

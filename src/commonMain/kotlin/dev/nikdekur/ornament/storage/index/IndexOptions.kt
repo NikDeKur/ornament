@@ -8,11 +8,15 @@
 
 package dev.nikdekur.ornament.storage.index
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 public data class IndexOptions(
     val name: String,
     val unique: Boolean = false
 )
 
+@Serializable
 public class IndexOptionsBuilder {
     public var name: String = ""
     public var unique: Boolean = false

@@ -5,6 +5,7 @@ import dev.nikdekur.ndkore.service.ServicesComponent
 import dev.nikdekur.ndkore.service.manager.ServicesManager
 import dev.nikdekur.ornament.environment.Environment
 import io.github.oshai.kotlinlogging.KLogger
+import kotlinx.datetime.Clock
 import kotlin.time.Duration
 
 /**
@@ -45,6 +46,8 @@ public interface Application : ServicesComponent, Unique<String> {
      */
     public val logger: KLogger
 
+    public val clock: Clock
+
     /**
      * The environment of the application.
      *
@@ -69,7 +72,10 @@ public interface Application : ServicesComponent, Unique<String> {
      *
      * @throws IllegalStateException if [init] is not called before.
      */
-    public suspend fun start(wait: Boolean = false)
+    public suspend fun start(
+        wait: Boolean = false,
+        throwOnError: Boolean = true
+    )
 
     /**
      * Stop the application.

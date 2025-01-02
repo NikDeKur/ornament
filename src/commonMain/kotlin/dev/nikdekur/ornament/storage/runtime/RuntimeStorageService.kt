@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlin.reflect.KClass
 
-public class RuntimeStorageService<A : Application>(
+public open class RuntimeStorageService<A : Application>(
     override val app: A
 ) : AbstractAppService<A>(), StorageService {
 

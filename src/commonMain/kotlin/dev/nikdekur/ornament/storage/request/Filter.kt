@@ -10,6 +10,8 @@
 
 package dev.nikdekur.ornament.storage.request
 
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 import kotlin.reflect.KProperty
 
 public enum class CompOperator {
@@ -21,10 +23,11 @@ public enum class CompOperator {
     LESS_THAN_OR_EQUALS
 }
 
+@Serializable
 public data class Filter(
     val key: String,
     val operator: CompOperator,
-    val value: Any?
+    @Contextual val value: Any?
 )
 
 
