@@ -6,7 +6,7 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
-package dev.nikdekur.ornament.protection
+package dev.nikdekur.ornament.protection.password
 
 /**
  * # Protection Service
@@ -17,7 +17,7 @@ package dev.nikdekur.ornament.protection
  * Different implementations of this service can provide different levels of security
  * or either no security at all.
  */
-public interface ProtectionService {
+public interface PasswordProtectionService {
 
     /**
      * Creates a password from a string.
@@ -41,6 +41,9 @@ public interface ProtectionService {
      * @return The deserialized password.
      */
     public fun deserializePassword(string: String): Password
+
+
+    public fun deserializePasswordData(data: String): Password.Data
 
     /**
      * Imitates password encryption.

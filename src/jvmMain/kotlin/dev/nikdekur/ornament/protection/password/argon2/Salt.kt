@@ -6,8 +6,9 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
-package dev.nikdekur.ornament.protection.argon2
+package dev.nikdekur.ornament.protection.password.argon2
 
+import dev.nikdekur.ndkore.ext.toHEX
 import kotlinx.serialization.Serializable
 
 @JvmInline

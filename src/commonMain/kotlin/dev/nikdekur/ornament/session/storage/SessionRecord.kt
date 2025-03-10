@@ -19,6 +19,9 @@ public data class SessionRecord(
 ) : Session
 
 
+public inline val SessionRecord.validBy: Instant
+    get() = issuedAt + ttl
+
 public inline fun SessionRecord.isOutdated(clock: Instant): Boolean {
     return (issuedAt + ttl) < clock
 }

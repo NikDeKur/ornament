@@ -86,11 +86,11 @@ public abstract class AbstractApplication : Application {
             beforeStart()
             logger.trace { "Before Start finished" }
 
-
             logger.debug { "Enabling services" }
             logger.recordTiming(TimeSource.Monotonic, "enabling services") {
                 servicesManager.enable()
             }
+
             logger.debug { "Services enabled!" }
 
 

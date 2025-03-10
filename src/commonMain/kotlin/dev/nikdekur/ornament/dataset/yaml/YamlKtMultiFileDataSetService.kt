@@ -60,7 +60,7 @@ public open class YamlKtMultiFileDataSetService<A : Application>(
 
     override fun read(): String {
         val fs = dataSet.fileSystem
-        fs.ensurePathExists(configsPath)
+        fs.ensurePathExists(configsPath, isFile = false)
 
         val text = readYaml(fs, configsPath, true)
 

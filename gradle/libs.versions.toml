@@ -1,20 +1,21 @@
 [versions]
-kotlin = "2.1.20-Beta1"
-kotlinx-coroutines = "1.9.0"
-kotlinx-serialization = "1.7.3"
+kotlin = "2.1.20-RC"
+kotlinx-coroutines = "1.10.1"
+kotlinx-serialization = "1.8.0"
+barray = "1.0.0"
 kotlinx-datetime = "0.6.1"
 kotlinx-io = "0.5.4"
 kotlin-logging = "7.0.0"
 stately = "2.1.0"
 ndkore = "1.5.0"
 bignum = "0.3.10"
-google-guava = "33.3.0-jre"
+google-guava = "33.4.0-jre"
 slf4j = "2.0.16"
 licenser = "0.6.1"
 yamlkt = "0.14.0"
 mongodb = "5.3.0-beta0"
 bouncycastle = "1.79"
-koin = "4.0.0"
+koin = "4.0.2"
 gson = "2.11.0"
 
 
@@ -24,6 +25,7 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-properties = { module = "org.jetbrains.kotlinx:kotlinx-serialization-properties", version.ref = "kotlinx-serialization" }
+kotlinx-serialization-barray = { module = "dev.nikdekur:kotlinx-serialization-barray", version.ref = "barray" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
 kotlin-logging = { module = "io.github.oshai:kotlin-logging", version.ref = "kotlin-logging" }

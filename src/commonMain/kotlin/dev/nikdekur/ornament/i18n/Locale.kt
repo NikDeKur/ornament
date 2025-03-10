@@ -142,20 +142,34 @@ public fun Locale.toLanguageTag(): String {
 }
 
 public fun String.toLocaleOrNull(): Locale? {
-    val parts = split("-", "_", ";", ",", " ")
-
+    // Split using delimiters with a limit to minimize memory allocations
+    val parts = split("-", "_", ";", ",", " ", limit = 4)
     if (parts.isEmpty() || parts[0].length !in 2..3) return null
 
-    val language = parts[0]
-    val script = if (parts.size > 1 && parts[1].length == 4) parts[1] else ""
-    val region = if (parts.size > 1 && parts[1].length != 4) parts.getOrNull(1) ?: "" else ""
-    val variant = if (parts.size > 2) parts.drop(2).joinToString("-") else ""
+    // Language: always lowercase
+    val language = parts[0].lowercase()
+    var index = 1
+    var script = ""
+    var region = ""
+    var variant = ""
 
-    // Check that the region has a length of 2
-    if (region.isNotEmpty() && region.length != 2) return null
+    // If the next part is 4 characters, treat it as the script
+    if (parts.size > index && parts[index].length == 4) {
+        val s = parts[index]
+        script = s[0].uppercase() + s.substring(1).lowercase()
+        index++
+    }
 
-    // Check that the script has a length of 4
-    if (script.isNotEmpty() && script.length != 4) return null
+    // If the next part is 2 characters, treat it as the region
+    if (parts.size > index && parts[index].length == 2) {
+        region = parts[index].uppercase()
+        index++
+    }
+
+    // Use the remaining part as variant, if available
+    if (parts.size > index) {
+        variant = parts[index].uppercase()
+    }
 
     return Locale(
         language = language,
@@ -164,6 +178,7 @@ public fun String.toLocaleOrNull(): Locale? {
         variant = variant
     )
 }
+
 
 public fun String.toLocale(): Locale = toLocaleOrNull() ?: throw IllegalArgumentException("Invalid locale: $this")
 

@@ -8,7 +8,7 @@
 
 @file:Suppress("NOTHING_TO_INLINE")
 
-package dev.nikdekur.ornament.protection.argon2
+package dev.nikdekur.ornament.protection.password.argon2
 
 import dev.nikdekur.ndkore.memory.MemoryAmount
 import dev.nikdekur.ndkore.memory.MemoryUnit
@@ -16,6 +16,7 @@ import dev.nikdekur.ndkore.memory.toInt
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator
 import org.bouncycastle.crypto.params.Argon2Parameters
 import java.security.SecureRandom
+import java.util.*
 
 
 public data class Argon2Encryptor(
@@ -52,7 +53,7 @@ public data class Argon2Encryptor(
 
 
     // Note: SecureRandom is slower nearly 10 times than Random, but it's more secure
-    public val random: java.util.Random = SecureRandom()
+    public val random: Random = SecureRandom()
 
     // SecureRandom (and Random) is not thread-safe, so we need to synchronise it
     @Synchronized
@@ -61,14 +62,4 @@ public data class Argon2Encryptor(
         random.nextBytes(array)
         return Salt(array)
     }
-}
-
-@OptIn(ExperimentalStdlibApi::class)
-public inline fun ByteArray.toHEX(): String {
-    return toHexString(HexFormat.Default)
-}
-
-@OptIn(ExperimentalStdlibApi::class)
-public inline fun String.fromHEX(): ByteArray {
-    return hexToByteArray(HexFormat.Default)
 }

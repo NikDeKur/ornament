@@ -13,7 +13,19 @@ import kotlin.reflect.KClass
 public interface DataSetSection {
     public fun getSection(key: String): DataSetSection?
     public fun <T : Any> get(key: String?, clazz: KClass<T>): T?
+    public fun contains(key: String): Boolean
 }
+
+public fun <T : Any> DataSetSection.getNested(keys: List<String>, clazz: KClass<T>): T? {
+    var section: DataSetSection = this
+    for (i in 0 until keys.size - 1) {
+        val key = keys[i]
+        section = section.getSection(key) ?: return null
+    }
+
+    return section.get(keys.last(), clazz)
+}
+
 
 public interface MutableDataSetSection : DataSetSection {
 

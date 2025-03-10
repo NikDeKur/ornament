@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "dev.nikdekur"
-version = "1.0.1"
+version = "1.1.0"
 
 val authorId: String by project
 val authorName: String by project
@@ -85,6 +85,8 @@ kotlin {
         jvmMain.dependencies {
             compileOnly(libs.slf4j.api)
 
+            compileOnly(libs.kotlinx.serialization.barray)
+
             // MONGODB
             compileOnly(libs.mongodb)
 
@@ -102,6 +104,9 @@ kotlin {
             implementation(libs.slf4j.api)
             implementation(libs.kotlin.logging)
             implementation(libs.bignum)
+
+
+            implementation(libs.kotlinx.serialization.barray)
 
             implementation(kotlin("test"))
 

@@ -10,7 +10,7 @@ package dev.nikdekur.ornament.account.storage
 
 import dev.nikdekur.ornament.account.Account
 import dev.nikdekur.ornament.account.Permission
-import dev.nikdekur.ornament.protection.Password
+import dev.nikdekur.ornament.protection.password.Password
 import kotlinx.serialization.Serializable
 
 @Serializable

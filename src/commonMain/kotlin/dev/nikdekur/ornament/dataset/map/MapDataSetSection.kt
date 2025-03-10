@@ -54,6 +54,7 @@ public open class MapDataSetSection(
     @Suppress("UNCHECKED_CAST")
     public fun <T : Any> resolve(obj: Any, clazz: KClass<T>): T? {
         if (clazz.isInstance(obj)) return obj as T
+
         when (clazz) {
             String::class -> return obj.toString() as T
             Byte::class -> return obj.toString().toByteOrNull() as? T
@@ -75,6 +76,14 @@ public open class MapDataSetSection(
     override operator fun <T : Any> get(key: String?, clazz: KClass<T>): T? {
         val actual = if (key == null) map else map[key] ?: return null
 
+        if (actual is Map<*, *> && MapDataSetSection::class == clazz) {
+            @Suppress("kotlin:S6530", "UNCHECKED_CAST") // We know the type is correct
+            return when (key) {
+                null -> this
+                else -> getSection(key)
+            } as T
+        }
+
         try {
             return resolve(actual, clazz) ?: throw SerializationException(key, clazz, actual.toString())
         } catch (e: XSerializationException) {
@@ -83,6 +92,10 @@ public open class MapDataSetSection(
         } catch (e: IllegalArgumentException) {
             throw SerializationException(key, clazz, actual.toString())
         }
+    }
+
+    override fun contains(key: String): Boolean {
+        return map.containsKey(key)
     }
 }
 

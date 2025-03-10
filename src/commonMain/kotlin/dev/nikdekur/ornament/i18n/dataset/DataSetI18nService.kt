@@ -9,22 +9,24 @@ import dev.nikdekur.ndkore.service.*
 import dev.nikdekur.ornament.Application
 import dev.nikdekur.ornament.dataset.DataSetService
 import dev.nikdekur.ornament.dataset.get
+import dev.nikdekur.ornament.dataset.getNested
 import dev.nikdekur.ornament.i18n.*
 import dev.nikdekur.ornament.service.AbstractAppService
 
 public open class DataSetI18nService<A : Application>(
     override val app: A,
     public val initialDataset: DataSetI18nDataSet? = null,
-    public val datasetQualifier: Qualifier = "i18n".qualifier
+    public val datasetQualifier: Qualifier = Qualifier.Empty,
+    public val i18nDatasetQualifier: Qualifier = "i18n".qualifier
 ) : AbstractAppService<A>(), I18nService {
 
     override val dependencies: Dependencies = dependencies {
-        -DataSetService::class
-        dependsOn(DataSetService::class, datasetQualifier)
+        dependsOn(DataSetService::class, datasetQualifier, optional = true)
+        dependsOn(DataSetService::class, i18nDatasetQualifier, optional = false)
     }
 
-    protected val datasetService: DataSetService? by injectOrNull()
-    protected val i18nDatasetService: DataSetService by inject(datasetQualifier)
+    protected val datasetService: DataSetService? by injectOrNull(datasetQualifier)
+    protected val i18nDatasetService: DataSetService by inject(i18nDatasetQualifier)
 
     override lateinit var defaultLocale: Locale
     public lateinit var parser: PlaceholderParser
@@ -56,8 +58,11 @@ public open class DataSetI18nService<A : Application>(
 
         val bundleSection = i18nDatasetService.getSection(getBundleFor(key))
         val localeSection = bundleSection?.getSection(getLocaleFor(key))
-        val foundTranslation = localeSection?.get<ArrayList<String>>(key.key)
-        val translation = foundTranslation?.joinToString("\n")
+        val foundTranslationRaw = localeSection?.getNested(key.key.split('.'), Any::class)
+        val translation =
+            if (foundTranslationRaw is Iterable<*>)
+                foundTranslationRaw.joinToString("\n")
+            else foundTranslationRaw?.toString()
 
         val allReplacements = key.placeholders.mapValues {
             if (key.translateNestedKeys && it.value is Key) {

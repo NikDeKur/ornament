@@ -6,24 +6,24 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
-package dev.nikdekur.ornament.protection
+package dev.nikdekur.ornament.protection.password
 
 import dev.nikdekur.ndkore.service.get
-import dev.nikdekur.ornament.protection.none.NoneProtectionService
+import dev.nikdekur.ornament.protection.password.none.NonePasswordProtectionService
 import dev.nikdekur.ornament.testApplication
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 
-class NoneProtectionServiceTest : ProtectionServiceTest() {
+class NonePasswordProtectionServiceTest : PasswordProtectionServiceTest() {
 
     @BeforeTest
     fun setup() = runTest {
         val server = testApplication(this) {
-            service(::NoneProtectionService, ProtectionService::class)
+            service(::NonePasswordProtectionService, PasswordProtectionService::class)
         }
         service = server.get()
     }
 
 
-    override lateinit var service: ProtectionService
+    override lateinit var service: PasswordProtectionService
 }

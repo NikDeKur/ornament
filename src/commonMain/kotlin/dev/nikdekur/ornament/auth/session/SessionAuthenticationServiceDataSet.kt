@@ -1,6 +1,7 @@
 package dev.nikdekur.ornament.auth.session
 
-import dev.nikdekur.ndkore.ext.LenientDurationSerializer
+import dev.nikdekur.ndkore.serial.LenientDurationSerializer
+import dev.nikdekur.ornament.protection.password.Password
 import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -15,5 +16,7 @@ public data class SessionAuthenticationServiceDataSet(
     val table: String = "session_tokens",
 
     @Serializable(with = LenientDurationSerializer::class)
-    val expires: Duration = 15.minutes
+    val expires: Duration = 15.minutes,
+
+    val significance: Password.Significance = Password.Significance.MEDIUM,
 )

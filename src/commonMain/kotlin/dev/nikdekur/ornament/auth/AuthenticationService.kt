@@ -18,7 +18,7 @@ public interface AuthenticationService {
     public sealed interface LoginResult {
         public object AccountNotFound : LoginResult
         public object WrongCredentials : LoginResult
-        public class Success(public val data: Map<String, Any>) : LoginResult
+        public class Success(public val data: Map<String, String>) : LoginResult
     }
 
     /**
@@ -49,22 +49,19 @@ public interface AuthenticationService {
      *
      * State is returned by [getAuthState] method.
      */
-    public enum class AuthState {
+    public sealed interface AuthState {
+
         /**
          * The user is authenticated.
          */
-        AUTHENTICATED,
+        public data class Authenticated(
+            val login: String
+        ) : AuthState
+
 
         /**
          * The user is not authenticated.
          */
-        UNAUTHENTICATED,
-
-        /**
-         * The user was authenticated, but authentication is no longer valid.
-         *
-         * Ex: session expired.
-         */
-        BAD_CREDENTIALS
+        public object NotAuthenticated : AuthState
     }
 }

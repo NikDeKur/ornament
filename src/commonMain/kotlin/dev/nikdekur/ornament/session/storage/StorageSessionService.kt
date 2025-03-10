@@ -7,8 +7,8 @@ import dev.nikdekur.ndkore.service.injectOrNull
 import dev.nikdekur.ornament.Application
 import dev.nikdekur.ornament.dataset.DataSetService
 import dev.nikdekur.ornament.dataset.get
-import dev.nikdekur.ornament.protection.Password
-import dev.nikdekur.ornament.protection.ProtectionService
+import dev.nikdekur.ornament.protection.password.Password
+import dev.nikdekur.ornament.protection.password.PasswordProtectionService
 import dev.nikdekur.ornament.service.AbstractAppService
 import dev.nikdekur.ornament.session.SessionService
 import dev.nikdekur.ornament.storage.StorageService
@@ -27,12 +27,12 @@ public open class StorageSessionService<A : Application>(
 
     override val dependencies: Dependencies = dependencies {
         -DataSetService::class
-        +ProtectionService::class
+        +PasswordProtectionService::class
         +StorageService::class
     }
 
     protected val datasetService: DataSetService? by injectOrNull()
-    protected val protectionService: ProtectionService by inject()
+    protected val passwordProtectionService: PasswordProtectionService by inject()
     protected val storageService: StorageService by inject()
 
     public lateinit var dataset: StorageSessionServiceDataSet
@@ -65,7 +65,7 @@ public open class StorageSessionService<A : Application>(
     ): Pair<String, SessionRecord> {
         val originalToken = dataset.fabric.createToken()
 
-        val encrypted = protectionService.createPassword(originalToken, significance)
+        val encrypted = passwordProtectionService.createPassword(originalToken, significance)
         val encryptedToken = encrypted.serialize()
         val record = SessionRecord(
             userId = userId,
@@ -116,7 +116,7 @@ public open class StorageSessionService<A : Application>(
             .firstOrNull {
                 if (checkOutdated(it)) return@firstOrNull false
 
-                val deserialized = protectionService.deserializePassword(it.tokenHashed)
+                val deserialized = passwordProtectionService.deserializePassword(it.tokenHashed)
                 deserialized.isEqual(token)
             }
     }

@@ -1,6 +1,6 @@
 package dev.nikdekur.ornament.session
 
-import dev.nikdekur.ornament.protection.Password
+import dev.nikdekur.ornament.protection.password.Password
 import dev.nikdekur.ornament.session.storage.SessionRecord
 import kotlin.time.Duration
 

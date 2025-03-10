@@ -74,7 +74,7 @@ public interface Application : ServicesComponent, Unique<String> {
      */
     public suspend fun start(
         wait: Boolean = false,
-        throwOnError: Boolean = true
+        throwOnException: Boolean = true
     )
 
     /**

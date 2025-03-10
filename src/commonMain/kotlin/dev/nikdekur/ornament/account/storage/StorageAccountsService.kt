@@ -18,8 +18,8 @@ import dev.nikdekur.ornament.account.Account
 import dev.nikdekur.ornament.account.AccountAlreadyExistsException
 import dev.nikdekur.ornament.account.AccountsService
 import dev.nikdekur.ornament.account.Permission
-import dev.nikdekur.ornament.protection.Password
-import dev.nikdekur.ornament.protection.ProtectionService
+import dev.nikdekur.ornament.protection.password.Password
+import dev.nikdekur.ornament.protection.password.PasswordProtectionService
 import dev.nikdekur.ornament.service.AbstractAppService
 import dev.nikdekur.ornament.storage.StorageService
 import dev.nikdekur.ornament.storage.StorageTable
@@ -37,7 +37,7 @@ public open class StorageAccountsService<A : Application>(
         +StorageService::class
     }
 
-    public val protectionService: ProtectionService by inject()
+    public val passwordProtectionService: PasswordProtectionService by inject()
     public val storage: StorageService by inject()
 
 
@@ -75,7 +75,7 @@ public open class StorageAccountsService<A : Application>(
     }
 
     public suspend fun registerAccount(dao: AccountDAO): Account {
-        val password = protectionService.deserializePassword(dao.password)
+        val password = passwordProtectionService.deserializePassword(dao.password)
         val account = SetAccount(dao.login, password, ConcurrentMutableSet())
         return AccountWrapper(this, account).also {
             dao.permissions.forEach {
@@ -109,7 +109,7 @@ public open class StorageAccountsService<A : Application>(
         if (getAccount(login) != null)
             throw AccountAlreadyExistsException(login)
 
-        val password = protectionService.createPassword(password, passwordSignificance)
+        val password = passwordProtectionService.createPassword(password, passwordSignificance)
         val dao = AccountDAO(
             login = login,
             password = password.serialize(),

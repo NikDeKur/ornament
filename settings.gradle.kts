@@ -5,12 +5,12 @@ plugins {
 dependencyResolutionManagement {
 
     repositories {
+        mavenLocal()
         maven {
             name = "ndkRepoReleases"
             url = uri("https://repo.nikdekur.tech/releases")
         }
         mavenCentral()
-        mavenLocal()
         google()
         maven {
             name = "Sonatype Snapshots (Legacy)"

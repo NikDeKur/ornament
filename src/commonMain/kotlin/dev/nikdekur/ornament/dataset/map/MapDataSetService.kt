@@ -52,6 +52,7 @@ public open class MapDataSetService<A : Application>(
 
     override fun getSection(key: String): DataSetSection? = root.getSection(key)
     override fun <T : Any> get(key: String?, clazz: KClass<T>): T? = root[key, clazz]
+    override fun contains(key: String): Boolean = root.contains(key)
 }
 
 

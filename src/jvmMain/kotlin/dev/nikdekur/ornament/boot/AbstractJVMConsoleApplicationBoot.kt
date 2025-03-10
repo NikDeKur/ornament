@@ -20,6 +20,8 @@ public abstract class AbstractJVMConsoleApplicationBoot : ApplicationBoot {
     public val logger: KLogger = KotlinLogging.logger { }
 
 
+    public open val wait: Boolean = true
+    public open val throwOnException: Boolean = true
 
     /**
      * Boot the application with console arguments.
@@ -31,6 +33,16 @@ public abstract class AbstractJVMConsoleApplicationBoot : ApplicationBoot {
      * @param args The console arguments.
      */
     public suspend fun boot(args: Array<String>) {
+
+        var finishCalled = false
+        fun onFinish() {
+            if (finishCalled) return
+
+            logger.info { "Bye!" }
+
+            finishCalled = true
+        }
+
         var id: String? = null
         try {
             logger.trace { "Booting application..." }
@@ -51,10 +63,15 @@ public abstract class AbstractJVMConsoleApplicationBoot : ApplicationBoot {
                 logger.info { "Shutting down `${id}`..." }
 
                 app.stop()
+
+                onFinish()
             }
 
             logger.trace { "Shutdown hook added." }
-            app.start(wait = true)
+            app.start(
+                wait = wait,
+                throwOnException = throwOnException
+            )
 
             val state = app.state
             if (state is State.ErrorStarting) throw state.error
@@ -63,10 +80,9 @@ public abstract class AbstractJVMConsoleApplicationBoot : ApplicationBoot {
 
         } catch (e: Throwable) {
             logger.error(e) { "Fatal error occurred during `${id ?: "UNKNOWN_ID"}` initialization. Shutting down..." }
+            onFinish()
             exitProcess(1)
 
-        } finally {
-            logger.info { "Bye!" }
         }
     }
 }

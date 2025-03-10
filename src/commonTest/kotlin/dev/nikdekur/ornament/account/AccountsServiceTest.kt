@@ -8,7 +8,7 @@
 
 package dev.nikdekur.ornament.account
 
-import dev.nikdekur.ornament.protection.Password
+import dev.nikdekur.ornament.protection.password.Password
 import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 

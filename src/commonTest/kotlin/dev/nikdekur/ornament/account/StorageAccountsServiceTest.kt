@@ -10,8 +10,8 @@ package dev.nikdekur.ornament.account
 
 import dev.nikdekur.ndkore.service.get
 import dev.nikdekur.ornament.account.storage.StorageAccountsService
-import dev.nikdekur.ornament.protection.ProtectionService
-import dev.nikdekur.ornament.protection.none.NoneProtectionService
+import dev.nikdekur.ornament.protection.password.PasswordProtectionService
+import dev.nikdekur.ornament.protection.password.none.NonePasswordProtectionService
 import dev.nikdekur.ornament.storage.StorageService
 import dev.nikdekur.ornament.storage.runtime.RuntimeStorageService
 import dev.nikdekur.ornament.testApplication
@@ -28,8 +28,8 @@ class StorageAccountsServiceTest : AccountsServiceTest() {
                 StorageService::class
             )
             service(
-                ::NoneProtectionService,
-                ProtectionService::class
+                ::NonePasswordProtectionService,
+                PasswordProtectionService::class
             )
             service(
                 ::StorageAccountsService,

@@ -1,8 +1,8 @@
-package dev.nikdekur.ornament.protection.argon2
+package dev.nikdekur.ornament.protection.password.argon2
 
 import dev.nikdekur.ndkore.memory.MemoryAmount
 import dev.nikdekur.ndkore.memory.MemoryAmount.Companion.mebiBytes
-import dev.nikdekur.ornament.protection.Password
+import dev.nikdekur.ornament.protection.password.Password
 import kotlinx.serialization.SerialName
 
 public data class Argon2SignificanceDataSet(

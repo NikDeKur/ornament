@@ -11,8 +11,14 @@
 package dev.nikdekur.ornament.i18n
 
 import dev.nikdekur.ndkore.placeholder.PlaceholderParser
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 public typealias PostProcessor = Key.(translation: String) -> String
 
@@ -140,3 +146,16 @@ public data class Key(
 
 public fun Key.withPlaceholders(vararg placeholders: Pair<String, Any?>): Key =
     copy(placeholders = this.placeholders + placeholders)
+
+
+public object StringKeySerializer : KSerializer<Key> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Key", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: Key) {
+        encoder.encodeString(value.key)
+    }
+
+    override fun deserialize(decoder: Decoder): Key {
+        return Key(key = decoder.decodeString())
+    }
+}

@@ -10,6 +10,7 @@
 
 package dev.nikdekur.ornament.dataset.yaml
 
+import dev.nikdekur.ndkore.ext.isBlankOrEmpty
 import dev.nikdekur.ornament.Application
 import dev.nikdekur.ornament.dataset.DataSetService
 import dev.nikdekur.ornament.dataset.MutableDataSetSection
@@ -39,10 +40,17 @@ public abstract class YamlKtDataSetService<A : Application>(
     override suspend fun onEnable() {
         val text = read()
 
+        val map = if (text.isBlankOrEmpty()) {
+            mutableMapOf()
+        } else {
+            yaml.decodeMapFromString(text).toMutableMap()
+        }
+
+
         @Suppress("UNCHECKED_CAST")
         delegateOrNull = MutableMapDataSetService(
             app,
-            yaml.decodeMapFromString(text).toMutableMap() as MutableMap<String, Any>,
+            map as MutableMap<String, Any>,
             json
         ).also { it.enable() }
     }
@@ -55,4 +63,5 @@ public abstract class YamlKtDataSetService<A : Application>(
 
     override fun <T : Any> get(key: String?, clazz: KClass<T>): T? = delegate.get<T>(key, clazz)
     override fun getSection(key: String): MutableDataSetSection? = delegate.getSection(key)
+    override fun contains(key: String): Boolean = delegate.contains(key)
 }

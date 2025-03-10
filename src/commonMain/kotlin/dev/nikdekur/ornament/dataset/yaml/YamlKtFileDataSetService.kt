@@ -32,18 +32,22 @@ public open class YamlKtFileDataSetService<A : Application>(
 
     override fun read(): String {
         val fs = dataSet.fileSystem
-        fs.ensurePathExists(configPath)
+        fs.ensurePathExists(configPath, isFile = true)
 
         val text = fs.source(configPath).buffered().use {
             it.readByteArray().decodeToString()
         }
 
-        initialHash = text.hashCode()
-
         logger.info { "Loaded File data set." }
         logger.debug { text }
 
         return text
+    }
+
+    override suspend fun onEnable() {
+        super.onEnable()
+
+        initialHash = delegateOrNull?.map?.hashCode()
     }
 
     override suspend fun onDisable() {
@@ -54,7 +58,7 @@ public open class YamlKtFileDataSetService<A : Application>(
             val yaml = yaml.encodeToString(delegate.map)
 
             // If the data set has not been modified, do not write to the file
-            if (yaml.hashCode() == initialHash) return
+            if (delegate.map.hashCode() == initialHash) return
 
             fs.sink(configPath).buffered().use {
                 it.write(yaml.encodeToByteArray())

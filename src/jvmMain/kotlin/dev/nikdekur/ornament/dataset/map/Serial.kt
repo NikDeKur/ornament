@@ -2,7 +2,7 @@
 
 package dev.nikdekur.ornament.dataset.map
 
-import dev.nikdekur.ndkore.ext.LenientDurationSerializer
+import dev.nikdekur.ndkore.serial.LenientDurationSerializer
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer

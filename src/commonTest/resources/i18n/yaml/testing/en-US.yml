@@ -4,5 +4,4 @@ key1:
 key2:
   - "Test {value}"
 
-key3:
-  - "Let's go test! {value} {value2}"
+key3: "Let's go test! {value} {value2}"

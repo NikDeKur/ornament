@@ -8,12 +8,11 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-public data class SessionToken(
+public data class SessionRecord(
     val login: String,
     val token: String,
     val validBy: Instant
 ) {
-
     public inline fun isValid(clock: Clock): Boolean {
         return clock.now() < validBy
     }
