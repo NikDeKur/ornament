@@ -24,5 +24,5 @@ public data class Sort(
     val order: Order
 )
 
-public inline fun KProperty<*>.desc() = Sort(name, Order.DESCENDING)
-public inline fun KProperty<*>.asc() = Sort(name, Order.ASCENDING)
+public inline fun KProperty<*>.desc(): Sort = Sort(name, Order.DESCENDING)
+public inline fun KProperty<*>.asc(): Sort = Sort(name, Order.ASCENDING)

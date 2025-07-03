@@ -97,6 +97,10 @@ public open class MapDataSetSection(
     override fun contains(key: String): Boolean {
         return map.containsKey(key)
     }
+
+    override fun toString(): String {
+        return "MapDataSetSection(map=$map)"
+    }
 }
 
 
@@ -135,4 +139,8 @@ public open class MutableMapDataSetSection(
         mutableMap.clear()
     }
 
+
+    override fun toString(): String {
+        return "MutableMapDataSetSection(map=$mutableMap)"
+    }
 }

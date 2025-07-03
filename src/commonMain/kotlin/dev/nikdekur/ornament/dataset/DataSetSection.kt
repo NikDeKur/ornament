@@ -43,4 +43,4 @@ public open class SerializationException(
 ) : RuntimeException("Failed to deserialize key '$key' to class '${clazz.simpleName}'. Value: $actual")
 
 
-public inline fun <reified T : Any> DataSetSection.get(key: String?) = get(key, T::class)
+public inline fun <reified T : Any> DataSetSection.get(key: String?): T? = get(key, T::class)
