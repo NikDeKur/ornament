@@ -34,6 +34,8 @@ public data class Key(
 
     public val translateNestedKeys: Boolean = true,
 
+    public val keysSeparator: String? = null,
+
     @Transient
     public val parser: PlaceholderParser? = null,
 
@@ -56,14 +58,10 @@ public data class Key(
     public fun filterPostProcessors(body: (PostProcessor) -> Boolean): Key =
         copy(postProcessors = postProcessors.filter(body))
 
-    public fun withParser(parser: PlaceholderParser?): Key =
-        copy(parser = parser)
-
     public fun withPlaceholders(placeholders: Map<String, Any?>): Key =
         copy(placeholders = placeholders + placeholders)
 
-    public fun withTranslateNestedKeys(option: Boolean): Key =
-        copy(translateNestedKeys = option)
+
 
     public fun withBundle(bundle: Bundle?, overwrite: Boolean = true): Key =
         if (bundle == this.bundle) {
@@ -83,29 +81,41 @@ public data class Key(
             this
         }
 
-    public fun withBoth(
-        bundle: Bundle?,
-        locale: Locale?,
-        overwriteBundle: Boolean = true,
-        overwriteLocale: Boolean = true,
-    ): Key {
-        val newBundle = if (this.bundle == null || overwriteBundle) {
-            bundle
+    public fun withParser(parse: PlaceholderParser?, overwrite: Boolean = true): Key =
+        if (parse == this.parser) {
+            this
+        } else if (this.parser == null || overwrite) {
+            copy(parser = parse)
         } else {
-            this.bundle
-        }
-
-        val newLocale = if (this.locale == null || overwriteLocale) {
-            locale
-        } else {
-            this.locale
-        }
-
-        if (newBundle == this.bundle && newLocale == this.locale) {
             this
         }
 
-        return copy(bundle = newBundle, locale = newLocale)
+    public fun withTranslateNestedKeys(translateNestedKeys: Boolean?, overwrite: Boolean = true): Key =
+        if (translateNestedKeys == null || translateNestedKeys == this.translateNestedKeys) {
+            this
+        } else if (overwrite) {
+            copy(translateNestedKeys = translateNestedKeys)
+        } else {
+            this
+        }
+
+    public fun withKeysSeparator(keysSeparator: String?, overwrite: Boolean = true): Key =
+        if (keysSeparator == null || keysSeparator == this.keysSeparator) {
+            this
+        } else if (overwrite) {
+            copy(keysSeparator = keysSeparator)
+        } else {
+            this
+        }
+
+
+    public fun copySettings(from: Key, to: Key, overwrite: Boolean = true): Key {
+        return to.withBundle(from.bundle, overwrite)
+            .withLocale(from.locale, overwrite)
+            .withParser(from.parser, overwrite)
+            .withTranslateNestedKeys(from.translateNestedKeys, overwrite)
+            .withKeysSeparator(from.keysSeparator, overwrite)
+            .withPlaceholders(from.placeholders)
     }
 
 
@@ -143,6 +153,12 @@ public data class Key(
             }
         }
 }
+
+public inline val Key.path: List<String>
+    get() {
+        val separator = keysSeparator ?: return listOf(key)
+        return key.split(separator)
+    }
 
 public fun Key.withPlaceholders(vararg placeholders: Pair<String, Any?>): Key =
     copy(placeholders = this.placeholders + placeholders)
