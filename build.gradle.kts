@@ -2,6 +2,7 @@
 
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -11,7 +12,7 @@ plugins {
 }
 
 group = "dev.nikdekur"
-version = "1.1.0"
+version = "1.2.0"
 
 val authorId: String by project
 val authorName: String by project
@@ -19,13 +20,9 @@ val authorName: String by project
 kotlin {
     explicitApi()
 
-    val javaVersion = JavaVersion.VERSION_1_8
     jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = javaVersion.toString()
-        }
-
         compilerOptions {
+            jvmTarget = JvmTarget.JVM_1_8
             freeCompilerArgs.addAll("-Xno-param-assertions", "-Xno-call-assertions")
         }
     }
@@ -44,13 +41,13 @@ kotlin {
 
     // Web
     js {
-        moduleName = project.name
+        outputModuleName = project.name
         browser()
         nodejs()
     }
 
     wasmJs {
-        moduleName = project.name + "Wasm"
+        outputModuleName = project.name + "Wasm"
         browser()
         nodejs()
     }
@@ -125,7 +122,6 @@ kotlin {
         }
     }
 }
-
 
 
 license {
