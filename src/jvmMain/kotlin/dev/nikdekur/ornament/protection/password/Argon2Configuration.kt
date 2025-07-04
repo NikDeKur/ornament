@@ -1,11 +1,10 @@
-package dev.nikdekur.ornament.protection.password.argon2
+package dev.nikdekur.ornament.protection.password
 
 import dev.nikdekur.ndkore.memory.MemoryAmount
-import dev.nikdekur.ndkore.memory.MemoryAmount.Companion.mebiBytes
-import dev.nikdekur.ornament.protection.password.Password
+import dev.nikdekur.ndkore.memory.mebiBytes
 import kotlinx.serialization.SerialName
 
-public data class Argon2SignificanceDataSet(
+public data class Argon2Configuration(
     @SerialName("salt_size")
     val saltSize: Int? = null,
 
@@ -21,8 +20,9 @@ public data class Argon2SignificanceDataSet(
     @SerialName("hash_time")
     val hashTime: IntRange? = null
 ) {
+
     public companion object {
-        public val LOWEST: Argon2SignificanceDataSet = Argon2SignificanceDataSet(
+        public val LOWEST: Argon2Configuration = Argon2Configuration(
             saltSize = 16,
             hashSize = 32,
             iterations = 4,
@@ -31,7 +31,7 @@ public data class Argon2SignificanceDataSet(
             hashTime = 0..0
         )
 
-        public val LOW: Argon2SignificanceDataSet = Argon2SignificanceDataSet(
+        public val LOW: Argon2Configuration = Argon2Configuration(
             saltSize = 16,
             hashSize = 32,
             iterations = 6,
@@ -40,7 +40,7 @@ public data class Argon2SignificanceDataSet(
             hashTime = 0..0
         )
 
-        public val MEDIUM: Argon2SignificanceDataSet = Argon2SignificanceDataSet(
+        public val MEDIUM: Argon2Configuration = Argon2Configuration(
             saltSize = 16,
             hashSize = 32,
             iterations = 8,
@@ -49,7 +49,7 @@ public data class Argon2SignificanceDataSet(
             hashTime = 0..0
         )
 
-        public val HIGH: Argon2SignificanceDataSet = Argon2SignificanceDataSet(
+        public val HIGH: Argon2Configuration = Argon2Configuration(
             saltSize = 16,
             hashSize = 32,
             iterations = 12,
@@ -58,7 +58,7 @@ public data class Argon2SignificanceDataSet(
             hashTime = 0..0
         )
 
-        public val HIGHEST: Argon2SignificanceDataSet = Argon2SignificanceDataSet(
+        public val HIGHEST: Argon2Configuration = Argon2Configuration(
             saltSize = 32,
             hashSize = 64,
             iterations = 16,
@@ -66,15 +66,5 @@ public data class Argon2SignificanceDataSet(
             lanes = 8,
             hashTime = 0..0
         )
-
-        public fun getDefaultFor(significance: Password.Significance): Argon2SignificanceDataSet {
-            return when (significance) {
-                Password.Significance.LOWEST -> LOWEST
-                Password.Significance.LOW -> LOW
-                Password.Significance.MEDIUM -> MEDIUM
-                Password.Significance.HIGH -> HIGH
-                Password.Significance.HIGHEST -> HIGHEST
-            }
-        }
     }
 }

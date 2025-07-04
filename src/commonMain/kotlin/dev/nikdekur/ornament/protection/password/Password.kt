@@ -12,79 +12,56 @@ package dev.nikdekur.ornament.protection.password
 /**
  * # Password
  *
- * Interface representing the basic functionality of a password.
+ * Interface representing a password with its associated metadata and hash.
+ * This interface provides methods to access and work with password data securely.
  */
 public interface Password {
 
+    /**
+     * The metadata associated with this password.
+     *
+     * This metadata contains all the information needed to recreate the password hash
+     * when provided with the original plaintext password. This includes parameters like
+     * salt, algorithm configuration, and other hashing parameters.
+     */
     public val data: Data
 
+    /**
+     * The raw bytes of the password hash.
+     *
+     * These bytes represent the actual hash value produced by applying the
+     * hashing algorithm to the plaintext password with the specified parameters.
+     */
     public val bytes: ByteArray
 
     /**
-     * Check if the password is equal to the given string.
+     * Serializes the password to a string format.
      *
-     * Might take some time to compute depending on the implementation.
+     * This method produces a string representation of the entire password object,
+     * including both the metadata and the hash. This string can be stored in a database
+     * and later used to recreate the password object using [PasswordEncoder.decodePassword].
      *
-     * @param password The password to compare to
-     * @return True if the password is equal to the given string, false otherwise
-     */
-    public fun isEqual(password: String): Boolean
-
-    /**
-     * Serialize the password to a string.
-     *
-     * This string should be able to be used to recreate the password using [PasswordProtectionService.deserializePassword].
-     *
-     * Distinct from [toString] which is for debugging purposes.
+     * @return A string representation of the password
      */
     public fun serialize(): String
 
-
-    public interface Data {
+    /**
+     * Interface representing password metadata.
+     *
+     * This interface encapsulates all the data required to recreate a password hash
+     * when provided with the original plaintext password. It typically includes parameters
+     * like salt, algorithm configuration, and other hashing parameters.
+     */
+    public fun interface Data {
         /**
-         * The significance of the password.
+         * Serializes the password metadata to a string format.
          *
-         * The significance this password has and was created with.
+         * This method produces a string representation of just the password metadata,
+         * which can be stored and later used to recreate the Data object using
+         * [PasswordEncoder.decodePasswordData].
          *
-         * Significance is used to adjust the protection of the password.
-         *
-         * @see Significance
-         */
-        public val significance: Significance
-
-        public fun toPassword(password: String): Password
-
-        /**
-         * Serialize the password's data to a string.
-         *
-         * This string should be able to be used to recreate the password using [PasswordProtectionService.deserializePassword].
+         * @return A string representation of the password metadata
          */
         public fun serialize(): String
-
-    }
-
-    /**
-     * # Significance
-     *
-     * Enum represents the significance of a password.
-     *
-     * The password protection will be adjusted based on the significance.
-     */
-    public enum class Significance {
-        LOWEST,
-        LOW,
-        MEDIUM,
-        HIGH,
-        HIGHEST
-        ;
-
-
-        public val key: Int = ordinal
-
-        public companion object {
-            public fun fromKey(key: Int): Significance {
-                return entries[key]
-            }
-        }
     }
 }
